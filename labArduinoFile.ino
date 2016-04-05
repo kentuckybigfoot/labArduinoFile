@@ -13,9 +13,11 @@ Adafruit_BNO055 bnoA = Adafruit_BNO055(-1, BNO055_ADDRESS_A);
 
 //maxdac dac(0x2A); Ignore because it is not attached currently
 
+File logFile;
+
 int readingIndex = 0;
+int fileCount = 0;
 bool resetOnce = false;
-char nameOfFile[] = "this";
 
 /* DAC is not attached currently. Commenting out in the mean time.
 void dacReset(void)
@@ -61,6 +63,30 @@ void displaySensorDetails(void)
 
 void setup() {
   Serial.begin(250000);
+
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  
+  Serial.println("initialization done.");
+
+  while ( SD.exists(char(++fileCount)) ) {
+    //Just keep walking
+  }
+
+  logFile = SD.open(char(fileCount), FILE_WRITE);
+  logFile.close();
+
+/*  if (SD.exists(fileCount)) {
+    Serial.println("Log file created successfully.");
+  } else {
+    Serial.println("Log file creation failed!");
+    delay(10000);
+  }
+  */
   if (analogRead(0) < 500) {
       /* Initialise the sensor */
       if (!bnoA.begin()) {
