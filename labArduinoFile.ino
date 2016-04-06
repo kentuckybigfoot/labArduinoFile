@@ -1,8 +1,8 @@
 #include <Wire.h>
+#include <MAXDAC.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
-#include <MAXDAC.h>
 
 #define BNO055_SAMPLERATE_DELAY_MS (0)
 
@@ -12,7 +12,16 @@ maxdac dac(0x2A);
 
 int readingIndex = 0;
 bool resetOnce = false;
-
+char milliConvert[18] = "";
+char milliConvert1[3] = "";
+char milliConvert2[3] = "";
+char milliConvert3[3] = "";
+char milliConvert4[3] = "";
+char milliConvert5[3] = "";
+char milliConvert6[3] = "";
+char milliConvert7[3] = "";
+char milliConvert8[3] = "";
+  
 void dacReset(void)
 {
   dac.shutDown(false);
@@ -20,7 +29,7 @@ void dacReset(void)
     dac.write(i, 255); //writes all the registers to full power
   }
   delay(1000);
-  for (int i=0; i<8; i++) {
+  for (int i =0; i<8; i++) {
     dac.write(i, 0); //writes all the registers to full power
   }
   delay(1000);
@@ -34,6 +43,7 @@ void dacReset(void)
   delay(1000);
   dac.reset();
 }
+
 void displaySensorDetails(void)
 {
   sensor_t sensorA;
@@ -54,6 +64,7 @@ void displaySensorDetails(void)
 
 void setup() {
   Serial.begin(250000);
+  
   if (analogRead(0) < 500) {
       /* Initialise the sensor */
       if (!bnoA.begin()) {
@@ -119,23 +130,28 @@ void loop(void) {
   }
   Serial.print(",");
 
-  int a = readingIndex % 2;     // calculate LSB
-  int b = readingIndex / 2 % 2;
-  int c = readingIndex / 4 % 2;
-  int d = readingIndex / 8 % 2;
-  int e = readingIndex / 16 % 2;
-  int f = readingIndex / 32 % 2;
-  int g = readingIndex / 64 % 2;
-  int h = readingIndex / 128 % 2;
+  long currentMilli = millis();
+  sprintf(milliConvert, "%016d", currentMilli);
+  sprintf(milliConvert1, "%c%c", milliConvert[0], milliConvert[1]);
+  sprintf(milliConvert2, "%c%c", milliConvert[2], milliConvert[3]);
+  sprintf(milliConvert3, "%c%c", milliConvert[4], milliConvert[5]);
+  sprintf(milliConvert4, "%c%c", milliConvert[6], milliConvert[7]);
+  sprintf(milliConvert5, "%c%c", milliConvert[8], milliConvert[9]);
+  sprintf(milliConvert6, "%c%c", milliConvert[10], milliConvert[11]);
+  sprintf(milliConvert7, "%c%c", milliConvert[12], milliConvert[13]);
+  sprintf(milliConvert8, "%c%c", milliConvert[14], milliConvert[15]);
   
-  dac.write(0, a * 127);
-  dac.write(1, b * 127);
-  dac.write(2, c * 127);
-  dac.write(3, d * 127);
-  dac.write(4, e * 127);
-  dac.write(5, f * 127);
-  dac.write(6, g * 127);
-  dac.write(7, h * 127);
+  dac.write(0, atoi(milliConvert1));
+  dac.write(1, atoi(milliConvert2));
+  dac.write(2, atoi(milliConvert3));
+  dac.write(3, atoi(milliConvert4));
+  dac.write(4, atoi(milliConvert5));
+  dac.write(5, atoi(milliConvert6));
+  dac.write(6, atoi(milliConvert7));
+  dac.write(7, atoi(milliConvert8));
+
+  Serial.print(milliConvert);
+  Serial.print(",");  
 
   /* Display the floating point data */
   /* Display calibration status for each sensor. */
